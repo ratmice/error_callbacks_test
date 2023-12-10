@@ -1,0 +1,13 @@
+[package]
+description = "test of the error_callbacks branch"
+name = "error_callbacks_test"
+version = "0.1.0"
+authors = ["matt rice <ratmice@gmail.com>"]
+edition = "2021"
+license = "Apache-2.0/MIT"
+
+[build-dependencies]
+cfgrammar = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
+lrlex = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
+lrpar = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
+lrtable = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
