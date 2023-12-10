@@ -11,3 +11,4 @@ cfgrammar = { git="https://github.com/ratmice/grmtools", branch="error_callbacks
 lrlex = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
 lrpar = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
 lrtable = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
+num-traits = "0.2.17"
