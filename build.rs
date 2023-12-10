@@ -1,5 +1,6 @@
 use cfgrammar::yacc::YaccGrammar;
 use cfgrammar::yacc::YaccGrammarError;
+use cfgrammar::yacc::ast::GrammarAST;
 use cfgrammar::yacc::YaccKind;
 use lrlex::{CTLexerBuilder, DefaultLexerTypes, LexBuildError};
 use lrpar::LexerTypes;
@@ -32,6 +33,7 @@ fn grammar_error(errs: Vec<YaccGrammarError>) -> Box<dyn Error> {
 }
 
 fn on_unexpected_conflicts(
+    ast: &GrammarAST,
     grm: &YaccGrammar,
     _sgraph: &StateGraph<<DefaultLexerTypes as LexerTypes>::StorageT>,
     stable: &StateTable<<DefaultLexerTypes as LexerTypes>::StorageT>,
