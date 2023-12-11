@@ -58,8 +58,6 @@ fn on_unexpected_conflicts<StorageT>(
 where
     usize: num_traits::AsPrimitive<StorageT>,
     StorageT: std::hash::Hash
-        + std::cmp::Eq
-        + std::marker::Copy
         + 'static
         + num_traits::PrimInt
         + num_traits::Unsigned
