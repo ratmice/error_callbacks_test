@@ -57,11 +57,8 @@ fn on_unexpected_conflicts<StorageT>(
 ) -> Box<dyn Error>
 where
     usize: num_traits::AsPrimitive<StorageT>,
-    StorageT: std::hash::Hash
-        + 'static
-        + num_traits::PrimInt
-        + num_traits::Unsigned
-        + std::fmt::Debug,
+    StorageT:
+        std::hash::Hash + 'static + num_traits::PrimInt + num_traits::Unsigned + std::fmt::Debug,
 {
     let prods = &ast.prods;
     let mut out = String::new();
