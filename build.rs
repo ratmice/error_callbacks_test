@@ -4,11 +4,11 @@ use cfgrammar::yacc::{
 };
 use lrlex::{CTLexerBuilder, LexBuildError};
 use lrtable::{statetable::Conflicts, StateGraph, StateTable};
-use num_traits;
+
 use std::error::Error;
 use std::fmt;
-const LEX_FILENAME: &'static str = "erroneous.l";
-const YACC_FILENAME: &'static str = "erroneous.y";
+const LEX_FILENAME: &str = "erroneous.l";
+const YACC_FILENAME: &str = "erroneous.y";
 
 /// A string which uses `Display` for it's `Debug` impl.
 struct ErrorString(String);
@@ -92,7 +92,7 @@ where
             out.push_str(format!("Reduce/reduce: {r1_name}/{r2_name}\n").as_str());
         }
         if needs_newline {
-            out.push_str("\n");
+            out.push('\n');
         }
         for (s_tok_idx, r_prod_idx, _st_idx) in c.sr_conflicts() {
             let r_rule_idx = grm.prod_to_rule(*r_prod_idx);
