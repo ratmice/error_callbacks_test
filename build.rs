@@ -66,7 +66,7 @@ where
         self.src = src.to_owned()
     }
 
-    fn on_lex_build_error(&mut self, errs: Box<[LexBuildError]>) {
+    fn on_lex_build_error(&mut self, errs: &[LexBuildError]) {
         self.errors.push_str(
             format!(
                 "Lex error: {}",
@@ -138,7 +138,7 @@ where
     fn grammar_path(&mut self, path: &path::Path) {
         self.path = path.to_owned();
     }
-    fn on_grammar_warning(&mut self, warnings: Box<[YaccGrammarWarning]>) {
+    fn on_grammar_warning(&mut self, warnings: &[YaccGrammarWarning]) {
         if warnings.len() > 1 {
             // Indent under the "Error:" prefix.
             self.warnings.push_str(
@@ -158,7 +158,7 @@ where
             )
         };
     }
-    fn on_grammar_error(&mut self, errs: Box<[YaccGrammarError]>) {
+    fn on_grammar_error(&mut self, errs: &[YaccGrammarError]) {
         self.errors.push_str(
             format!(
                 "Parse error: {}",
