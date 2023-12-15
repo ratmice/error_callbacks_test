@@ -7,8 +7,8 @@ edition = "2021"
 license = "Apache-2.0/MIT"
 
 [build-dependencies]
-cfgrammar = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
-lrlex = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
-lrpar = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
-lrtable = { git="https://github.com/ratmice/grmtools", branch="error_callbacks" }
+cfgrammar = { git="https://github.com/ratmice/grmtools", branch="error_handler_trait" }
+lrlex = { git="https://github.com/ratmice/grmtools", branch="error_handler_trait" }
+lrpar = { git="https://github.com/ratmice/grmtools", branch="error_handler_trait" }
+lrtable = { git="https://github.com/ratmice/grmtools", branch="error_handler_trait" }
 num-traits = "0.2.17"
