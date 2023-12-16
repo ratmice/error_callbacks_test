@@ -69,10 +69,7 @@ struct AriadneGrammarErrorHandler<'a> {
     path: path::PathBuf,
     err_reports: Vec<Report<'a, GSpan>>,
     warning_reports: Vec<Report<'a, GSpan>>,
-    errors: String,
-    warnings: String,
     warnings_are_errors: bool,
-    //newline_cache: NewlineCache,
 }
 
 impl<'a> AriadneLexErrorHandler<'a> {
@@ -169,8 +166,6 @@ impl<'a> AriadneGrammarErrorHandler<'a> {
         Self {
             src: String::new(),
             path: path::PathBuf::new(),
-            errors: String::new(),
-            warnings: String::new(),
             warnings_are_errors: false,
             err_reports: vec![],
             warning_reports: vec![],
@@ -232,7 +227,6 @@ where
         LexerTypesT::StorageT:
             std::hash::Hash + 'static + num_traits::PrimInt + num_traits::Unsigned + fmt::Debug,
     {
-        let mut needs_newline = false;
         let path_name = self.path.display().to_string();
 
         // I'm not sure yet what of this information is going to be helpful yet.
@@ -241,8 +235,6 @@ where
         //
         // We'll need to figure out what we actually need
         for (r1_prod_idx, r2_prod_idx, _st_idx) in c.rr_conflicts() {
-            needs_newline = true;
-
             let (_r1_prod_names, _r1_prod_spans) = pidx_prods_data(ast, *r1_prod_idx);
             let (_r2_prod_names, _r2_prod_spans) = pidx_prods_data(ast, *r2_prod_idx);
 
@@ -261,9 +253,6 @@ where
             .with_label(Label::new(GSpan(path_name.clone(), r1_span)).with_message("1st Reduce"))
             .with_label(Label::new(GSpan(path_name.clone(), r2_span)).with_message("2nd Reduce"));
             self.err_reports.push(report.finish());
-        }
-        if needs_newline {
-            self.errors.push('\n');
         }
         for (s_tok_idx, r_prod_idx, _st_idx) in c.sr_conflicts() {
             let r_rule_idx = grm.prod_to_rule(*r_prod_idx);
@@ -293,9 +282,9 @@ where
     }
 
     fn results(&self) -> Result<(), Box<dyn error::Error>> {
-        if self.errors.is_empty() {
+        if self.err_reports.is_empty() {
             Ok(())
-        } else if self.warnings.is_empty() {
+        } else if self.warning_reports.is_empty() {
             let mut x: Vec<u8> = vec![];
             let path_name = self.path.display().to_string();
             let mut srcs = ariadne::sources(vec![(path_name, self.src.as_str())]);
@@ -368,7 +357,6 @@ fn main() -> Result<(), Box<dyn error::Error>> {
         .lexer_in_src_dir(LEX_FILENAME)
         .unwrap()
         .build()?;
-    eprintln!("warnings: {}", (*grammar_error_handler).borrow().warnings);
     // For debugging in case we succeed
     panic!();
     //    Ok(())
