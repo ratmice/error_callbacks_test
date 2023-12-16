@@ -1,3 +1,4 @@
+use ariadne::{Label, Report, ReportKind};
 use cfgrammar::yacc::{
     ast::{self, GrammarAST},
     YaccGrammar, YaccGrammarError, YaccGrammarWarning, YaccKind,
@@ -6,8 +7,7 @@ use cfgrammar::{PIdx, Span, Spanned};
 use lrlex::{CTLexerBuilder, LexBuildError, LexErrorHandler};
 use lrpar::{GrammarErrorHandler, LexerTypes};
 use lrtable::{statetable::Conflicts, StateGraph, StateTable};
-use std::{cell::RefCell, error, fmt, path, rc::Rc, collections::HashSet};
-use ariadne::{Report, ReportKind, Label};
+use std::{cell::RefCell, collections::HashSet, error, fmt, path, rc::Rc};
 
 const LEX_FILENAME: &str = "erroneous.l";
 const YACC_FILENAME: &str = "erroneous.y";
@@ -85,7 +85,8 @@ impl<'a> AriadneLexErrorHandler<'a> {
     }
 }
 
-impl<'a, StorageT, LexemeT, ErrorT, LexerTypesT> LexErrorHandler<LexerTypesT> for AriadneLexErrorHandler<'a>
+impl<'a, StorageT, LexemeT, ErrorT, LexerTypesT> LexErrorHandler<LexerTypesT>
+    for AriadneLexErrorHandler<'a>
 where
     LexerTypesT: LexerTypes<LexErrorT = ErrorT, LexemeT = LexemeT, StorageT = StorageT>,
     StorageT: Copy + 'static,
@@ -103,19 +104,17 @@ where
         for err in errs {
             let spans = err.spans();
             let span = spans.first().unwrap();
-            let report = ariadne::Report::<LSpan>::build(
-                    ReportKind::Error, path_name.clone(), span.start(),
-                ).with_message(err.to_string());
+            let report =
+                ariadne::Report::<LSpan>::build(ReportKind::Error, path_name.clone(), span.start())
+                    .with_message(err.to_string());
             self.reports.push(report.finish())
         }
     }
 
     fn missing_in_lexer(&mut self, missing: &HashSet<String>) {
         let path_name = self.path.display().to_string();
-        let mut report = Report::<LSpan>::build(
-            ReportKind::Error, path_name, 0,
-        ).with_message(
-            "The following tokens are used in the grammar but are not defined in the lexer:"
+        let mut report = Report::<LSpan>::build(ReportKind::Error, path_name, 0).with_message(
+            "The following tokens are used in the grammar but are not defined in the lexer:",
         );
         if !missing.is_empty() {
             let mut iter = missing.iter();
@@ -131,9 +130,12 @@ where
     fn missing_in_parser(&mut self, missing: &HashSet<String>) {
         let path_name = self.path.display().to_string();
         let mut report = Report::<LSpan>::build(
-            ReportKind::Error, path_name, 0, // 0 not sure what else, EOF probably
-        ).with_message(
-            "The following tokens are used in the lexer but are not defined in the grammar"
+            ReportKind::Error,
+            path_name,
+            0, // 0 not sure what else, EOF probably
+        )
+        .with_message(
+            "The following tokens are used in the lexer but are not defined in the grammar",
         );
         if !missing.is_empty() {
             let mut iter = missing.iter();
@@ -152,14 +154,12 @@ where
         } else {
             let mut x: Vec<u8> = vec![];
             let path_name = self.path.display().to_string();
-            let mut srcs = ariadne::sources(vec![
-                (path_name, self.src.as_str()),
-            ]);
+            let mut srcs = ariadne::sources(vec![(path_name, self.src.as_str())]);
             for r in &self.reports {
                 r.write(&mut srcs, &mut x)?;
             }
             let s = String::from_utf8(x).unwrap();
-           Err(ErrorString(s).into())
+            Err(ErrorString(s).into())
         }
     }
 }
@@ -200,8 +200,11 @@ where
             let spans = w.spans();
             let span = spans.first().unwrap();
             let report = ariadne::Report::<GSpan>::build(
-                    ReportKind::Warning, path_name.clone(), span.start(),
-                ).with_message(w.to_string());
+                ReportKind::Warning,
+                path_name.clone(),
+                span.start(),
+            )
+            .with_message(w.to_string());
             self.warning_reports.push(report.finish())
         }
     }
@@ -210,9 +213,9 @@ where
         for err in errs {
             let spans = err.spans();
             let span = spans.first().unwrap();
-            let report = ariadne::Report::<GSpan>::build(
-                    ReportKind::Error, path_name.clone(), span.start(),
-                ).with_message(err.to_string());
+            let report =
+                ariadne::Report::<GSpan>::build(ReportKind::Error, path_name.clone(), span.start())
+                    .with_message(err.to_string());
             self.err_reports.push(report.finish())
         }
     }
@@ -250,10 +253,13 @@ where
             let _r1_name = grm.rule_name_str(r1_rule_idx);
             let _r2_name = grm.rule_name_str(r2_rule_idx);
             let report = ariadne::Report::<GSpan>::build(
-                    ariadne::ReportKind::Error, path_name.clone(), r1_span.start(),
-                ).with_message("Reduce/Reduce".to_string())
-                .with_label(Label::new(GSpan(path_name.clone(), r1_span)).with_message("1st Reduce"))
-                .with_label(Label::new(GSpan(path_name.clone(), r2_span)).with_message("2nd Reduce"));
+                ariadne::ReportKind::Error,
+                path_name.clone(),
+                r1_span.start(),
+            )
+            .with_message("Reduce/Reduce".to_string())
+            .with_label(Label::new(GSpan(path_name.clone(), r1_span)).with_message("1st Reduce"))
+            .with_label(Label::new(GSpan(path_name.clone(), r2_span)).with_message("2nd Reduce"));
             self.err_reports.push(report.finish());
         }
         if needs_newline {
@@ -268,12 +274,19 @@ where
             let rule_idx = grm.prod_to_rule(*r_prod_idx);
             let rule_span = grm.rule_name_span(rule_idx);
             let report = ariadne::Report::<GSpan>::build(
-                    ariadne::ReportKind::Error, path_name.clone(), rule_span.start(),
-                ).with_message("Shift/Reduce".to_string())
-                .with_label(Label::new(GSpan(path_name.clone(), s_tok_span)).with_message("Shifted"))
-                .with_label(Label::new(GSpan(path_name.clone(), rule_span)).with_message("Reduced rule"));
+                ariadne::ReportKind::Error,
+                path_name.clone(),
+                rule_span.start(),
+            )
+            .with_message("Shift/Reduce".to_string())
+            .with_label(Label::new(GSpan(path_name.clone(), s_tok_span)).with_message("Shifted"))
+            .with_label(
+                Label::new(GSpan(path_name.clone(), rule_span)).with_message("Reduced rule"),
+            );
             let report = r_prod_spans.iter().fold(report, |report, span| {
-                report.with_label(Label::new(GSpan(path_name.clone(), *span)).with_message("Reduced production"))
+                report.with_label(
+                    Label::new(GSpan(path_name.clone(), *span)).with_message("Reduced production"),
+                )
             });
             self.err_reports.push(report.finish());
         }
@@ -285,33 +298,32 @@ where
         } else if self.warnings.is_empty() {
             let mut x: Vec<u8> = vec![];
             let path_name = self.path.display().to_string();
-            let mut srcs = ariadne::sources(vec![
-                (path_name, self.src.as_str()),
-            ]);
+            let mut srcs = ariadne::sources(vec![(path_name, self.src.as_str())]);
             for r in &self.err_reports {
                 r.write(&mut srcs, &mut x)?;
             }
             let s = String::from_utf8(x).unwrap();
-            Err(ErrorString(format!("\n{}", s)).into()) 
+            Err(ErrorString(format!("\n{}", s)).into())
         } else {
-            let mut srcs = ariadne::sources(vec![
-                (self.path.display().to_string(), self.src.as_str()),
-            ]);
+            let mut srcs =
+                ariadne::sources(vec![(self.path.display().to_string(), self.src.as_str())]);
 
-            let (warnings, errors) =
-                ({
+            let (warnings, errors) = (
+                {
                     let mut x: Vec<u8> = vec![];
                     for r in &self.warning_reports {
                         r.write(&mut srcs, &mut x)?;
                     }
                     String::from_utf8(x)?
-                }, {
+                },
+                {
                     let mut x: Vec<u8> = vec![];
                     for r in &self.err_reports {
                         r.write(&mut srcs, &mut x)?;
                     }
                     String::from_utf8(x)?
-                });
+                },
+            );
             Err(ErrorString(format!(
                 "\nWarnings:\n{}\n\nErrors:\n{}\n",
                 warnings, errors
@@ -359,5 +371,5 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     eprintln!("warnings: {}", (*grammar_error_handler).borrow().warnings);
     // For debugging in case we succeed
     panic!();
-//    Ok(())
+    //    Ok(())
 }
