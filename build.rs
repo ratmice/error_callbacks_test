@@ -58,13 +58,13 @@ impl fmt::Debug for ErrorString {
     }
 }
 impl error::Error for ErrorString {}
-struct TestLexErrorHandler<'a> {
+struct AriadneLexErrorHandler<'a> {
     src: String,
     path: path::PathBuf,
     reports: Vec<Report<'a, LSpan>>,
 }
 
-struct TestGrammarErrorHandler<'a> {
+struct AriadneGrammarErrorHandler<'a> {
     src: String,
     path: path::PathBuf,
     err_reports: Vec<Report<'a, GSpan>>,
@@ -75,7 +75,7 @@ struct TestGrammarErrorHandler<'a> {
     //newline_cache: NewlineCache,
 }
 
-impl<'a> TestLexErrorHandler<'a> {
+impl<'a> AriadneLexErrorHandler<'a> {
     fn new() -> Self {
         Self {
             src: String::new(),
@@ -85,7 +85,7 @@ impl<'a> TestLexErrorHandler<'a> {
     }
 }
 
-impl<'a, StorageT, LexemeT, ErrorT, LexerTypesT> LexErrorHandler<LexerTypesT> for TestLexErrorHandler<'a>
+impl<'a, StorageT, LexemeT, ErrorT, LexerTypesT> LexErrorHandler<LexerTypesT> for AriadneLexErrorHandler<'a>
 where
     LexerTypesT: LexerTypes<LexErrorT = ErrorT, LexemeT = LexemeT, StorageT = StorageT>,
     StorageT: Copy + 'static,
@@ -164,7 +164,7 @@ where
     }
 }
 
-impl<'a> TestGrammarErrorHandler<'a> {
+impl<'a> AriadneGrammarErrorHandler<'a> {
     fn new() -> Self {
         Self {
             src: String::new(),
@@ -178,7 +178,7 @@ impl<'a> TestGrammarErrorHandler<'a> {
     }
 }
 
-impl<'a, LexerTypesT> GrammarErrorHandler<LexerTypesT> for TestGrammarErrorHandler<'a>
+impl<'a, LexerTypesT> GrammarErrorHandler<LexerTypesT> for AriadneGrammarErrorHandler<'a>
 where
     LexerTypesT: LexerTypes,
     usize: num_traits::AsPrimitive<LexerTypesT::StorageT>,
@@ -341,8 +341,8 @@ where
 }
 
 fn main() -> Result<(), Box<dyn error::Error>> {
-    let mut lex_error_handler = TestLexErrorHandler::new();
-    let grammar_error_handler = Rc::new(RefCell::new(TestGrammarErrorHandler::new()));
+    let mut lex_error_handler = AriadneLexErrorHandler::new();
+    let grammar_error_handler = Rc::new(RefCell::new(AriadneGrammarErrorHandler::new()));
     let geh = Rc::clone(&grammar_error_handler);
 
     CTLexerBuilder::new()
