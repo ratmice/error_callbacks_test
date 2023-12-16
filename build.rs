@@ -114,11 +114,7 @@ where
             "The following tokens are used in the grammar but are not defined in the lexer:",
         );
         if !missing.is_empty() {
-            let mut iter = missing.iter();
-            let mut note = String::from(iter.next().unwrap());
-            for n in missing {
-                note.push_str(format!(", {}", n).as_str());
-            }
+            let note = missing.iter().cloned().collect::<Vec<_>>().join(", ");
             report.set_note(note);
         }
         self.reports.push(report.finish());
